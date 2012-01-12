@@ -1,0 +1,12 @@
+ARM{in}
+Admin interface for ARM-based PCs
+
+Web Framework: Padrino
+:renderer: haml
+:test: shoulda
+:orm: activerecord
+:mock: none
+:stylesheet: less
+:script: jquery
+
+Webserver: Thin
