@@ -1,0 +1,19 @@
+!!! Strict
+%html
+  %head
+    %title= [@title, "Armin"].compact.join(" | ")
+    %link{:href=> "/assets/application.css", :type=> "text/css", :media => "screen",  :rel=> "stylesheet" }
+    %script{ :src => '/assets/application', :type => 'text/javascript', :charset => 'utf-8' }
+    = yield_content :include
+  %body
+    %header
+      %h1 ARM{in}
+      %h4 Adm{in} interface for ARM-based PCs
+    %section#sidebar
+      %a{:href => "#", :class=> "active"} Running services
+      %a{:href => "#"} File sharing
+      %a{:href => "#"} Media streaming
+    %section#offset
+      &nbsp;
+    %section#main= yield
+    
