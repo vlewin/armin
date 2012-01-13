@@ -1,0 +1,20 @@
+@import 'reset.css';
+@import 'grid.scss';
+
+$columns: 12;
+$column-width: 60;
+$gutter-width: 20;
+
+$total-width: 100%;
+
+header#top {
+	margin-bottom: 1em;
+}
+
+#main {
+	@include column(9);
+}
+
+#sidebar {
+	@include column(3);
+}

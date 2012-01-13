@@ -1,5 +1,6 @@
 class Armin < Padrino::Application
-  register LessInitializer
+  #register LessInitializer
+  register ScssInitializer
   register Padrino::Rendering
   register Padrino::Helpers
 
@@ -11,7 +12,7 @@ class Armin < Padrino::Application
   enable :sessions
   layout :application 
   
-  get :index do
+  get :index, :map => "/" do
     render 'main/index'
   end
 

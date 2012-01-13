@@ -7,11 +7,11 @@ gem 'thin'
 # Project requirements
 gem 'rake'
 gem 'sinatra-flash', :require => 'sinatra/flash'
-
 gem 'padrino-sprockets', :require => 'padrino/sprockets'
+gem 'sys-proctable'
 
 # Component requirements
-gem 'rack-less'
+gem 'sass'
 gem 'haml'
 gem 'activerecord', :require => "active_record"
 gem 'sqlite3'

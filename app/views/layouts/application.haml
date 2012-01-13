@@ -10,10 +10,9 @@
       %h1 ARM{in}
       %h4 Adm{in} interface for ARM-based PCs
     %section#sidebar
-      %a{:href => "#", :class=> "active"} Running services
+      = link_to 'Index', url_for(:index)
+      = link_to "Running services", url_for(:services, :index), :class => "active"
       %a{:href => "#"} File sharing
       %a{:href => "#"} Media streaming
-    %section#offset
-      &nbsp;
     %section#main= yield
     
