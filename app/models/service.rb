@@ -4,39 +4,33 @@ require 'open3'
 include Sys
 
 class Service
-  attr_accessor :pid,:name, :status
+  attr_accessor :pid, :name, :status
   INIT_DIR = "/etc/init.d"
   
-  def initialize(pid, name = nil)
+  def initialize(pid, name = nil, status = nil)
     @pid = pid
     @name = name
+    @status = status
   end
 
-  def self.running_services
+  def self.all
     services = Array.new
-    ProcTable.ps do |p|
-      services << Service.new(p.pid.to_i, p.comm) # if p.pid > 1000 
-    end
-    services.uniq_by{|s| s.name }.sort_by{|s| s.name }
-  end
-  
-  def self.init_services
-    services = Array.new
+    processes = Hash.new
+    
+    # list all services in /etc/init.d/
     Dir.chdir(INIT_DIR)
-    Dir.entries(".").each do |s|
-      if File.file?(s) && s != "." && s != ".."
-        services << Service.new(IO.popen('pidof #{s}').readlines.first, s)
-        puts "READ #{s} PID #{IO.popen('pidof #{s}').readlines}"
-      end
-      
+    files = Dir.entries(".").each{|f| f if File.file?(f) }
+
+    # get running processes from proc table
+    ProcTable.ps.each{|p| processes[p.comm] = p.pid }
+    
+    # TODO: find a way how to match deamon services like mysql{d} or ssh{d} -> openSUSE only???
+    files.each do |f|
+      status = processes[f].nil? ? "-" : "running"
+      services << Service.new(processes[f], f, status)
     end
     
-    services
-  end
-  
-  def self.all
-    Dir.chdir(INIT_DIR)
-    Dir.entries(".").each{|f| f}
+    services.sort_by{|s| s.name }
   end
 
   def stop
