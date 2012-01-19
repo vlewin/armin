@@ -6,7 +6,7 @@ Web Framework: Padrino
 :test: shoulda
 :orm: activerecord
 :mock: none
-:stylesheet: less
+:stylesheet: css
 :script: jquery
 
 Webserver: Thin
