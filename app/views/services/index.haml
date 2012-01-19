@@ -1,4 +1,11 @@
 %h2 Services
+%div#services.size1of1
+  - @running.each do |s|
+    %div.size1of3= s.name.inspect
+    %div.size1of3= s.pid
+    %div.size1of3
+      %div.size1of2.textRight
+        = @services.include?(s.name)? "running" : " --- "
+      %div.size1of2.textRight
+        %a{:href=>" ", "data-pid" => s.pid }= "stop"
 
-- @services.each do |s|
-    %p= "#{s.pid} #{s.name}"

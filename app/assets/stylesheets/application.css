@@ -6,39 +6,3 @@
 *= require_self
 */
 
-body { font-family: Georgia; color: #666; }
-
-h1 { font-size: 2em; line-height:1.5em; }
-h2 { font-size: 1.5em; line-height:1.5em; }
-
-header {
-	background-color: black;
-	margin-bottom: 2em;
-	padding: 2em;
-	color: white;
-}
-
-#sidebar, #main { line-height:1.5em; }
-#sidebar a {
-	display:block;
-	text-align:right;
-	color:#666;
-	font-size:1.5em;
-	line-height:1.5em;
-	text-decoration:none;
-	padding: 0px 15px;
-	text-shadow: 0px 1px #fff;
-}
-
-#sidebar a:hover {
-	color:#fff;
-	background:#a0a0a0;
-	text-shadow: 0px -1px #000;
-		
-}
-
-#sidebar a.active {
-	color:#fff;
-	background:#666;
-	text-shadow: 0px -1px #000;
-}
