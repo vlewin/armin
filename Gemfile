@@ -8,12 +8,14 @@ gem 'thin'
 gem 'rake'
 gem 'sinatra-flash', :require => 'sinatra/flash'
 gem 'padrino-sprockets', :require => 'padrino/sprockets'
+
 gem 'sys-proctable'
+gem 'json'
 
 # Component requirements
 gem 'sass'
 gem 'haml'
-gem 'activerecord', :require => "active_record"
+gem 'activerecord', "3.1.3", :require => "active_record"
 gem 'sqlite3'
 
 # Test requirements
