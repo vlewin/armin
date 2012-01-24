@@ -1,13 +1,8 @@
-%h2 Services
-%div#services.size1of1
-  - @services.each do |s|
-    %div.size1of3= s.name
-    %div.size1of3
-      = s.pid
-      &nbsp;
-    %div.size1of3
-      %div.size1of2
-        = s.status
-      %div.size1of2
-        %a{:href=>" ", "data-pid" => s.pid }= "stop" if s.status == "running"
+= flash_tag :notice
 
+%h2 Services
+= @settings.inspect
+= link_to "Settings", url_for(:services, :settings)
+
+
+#services= partial 'services/list'

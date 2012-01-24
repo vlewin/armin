@@ -1,13 +1,12 @@
-require 'sys/proctable'
-require 'open3'
-
-include Sys
+DAEMON = {"ssh" => "sshd", "ntp" => "ntpd", "samba" => "smbd"}
+EXCLUDE = ["rsyslog", "portmap", "acpid"]
+SETTINGS = File.join(PADRINO_ROOT, "/app/conf/settings.json")
 
 class Service
   attr_accessor :pid, :name, :status
   INIT_DIR = "/etc/init.d"
-  
-  def initialize(pid, name = nil, status = nil)
+
+  def initialize(pid = nil, name = nil, status = nil)
     @pid = pid
     @name = name
     @status = status
@@ -16,30 +15,69 @@ class Service
   def self.all
     services = Array.new
     processes = Hash.new
-    
+
     # list all services in /etc/init.d/
     Dir.chdir(INIT_DIR)
     files = Dir.entries(".").each{|f| f if File.file?(f) }
 
-    # get running processes from proc table
-    ProcTable.ps.each{|p| processes[p.comm] = p.pid }
-    
-    # TODO: find a way how to match deamon services like mysql{d} or ssh{d} -> openSUSE only???
-    files.each do |f|
-      status = processes[f].nil? ? "-" : "running"
-      services << Service.new(processes[f], f, status)
+    # get running processes from ps
+    psaux = `ps aux`
+    psaux.split("\n").select do |line|
+      processes[line.split[10].split("/").last] = line.split[1] unless line.split[10].match(/\[/)
     end
-    
+
+    files.each do |f|
+      if EXCLUDE.include?(f) # replace through user settings
+        puts "Process in black list #{f}"
+      else
+        if DAEMON[f]
+          puts "Process in white list #{f}"
+          services << Service.new(processes[DAEMON[f]], f, processes[DAEMON[f]].nil? ? "-" : "running")
+        else
+          services << Service.new(processes[f], f, processes[f].nil? ? "-" : "running")
+        end
+      end
+    end
+
     services.sort_by{|s| s.name }
   end
 
-  def stop
-    #system('kill #{self.pid}')
-    #status = `kill #{self.pid}`
-    stdin, stdout, stderr = Open3.popen3('kill #{self.pid}')
-    puts stdin.inspect
-    puts stdout.readlines
-    puts stderr.readlines
+  # TODO: Forward output to UI
+  def exec(action)
+    out = system('#{INIT_DIR}/#{self.name} #{action}')
+    back = `#{INIT_DIR}/#{self.name} #{action}`
+    puts "#{INIT_DIR}/#{self.name} #{action}"
+    puts out.inspect
+    puts back.inspect
+  end
+
+  # store settings in JSON format
+  class Settings
+    # Load settings
+    def self.load
+      if File.exist?(SETTINGS)
+        file = File.open(SETTINGS)
+        settings = file.read
+        puts settings.inspect
+        file.close
+      end
+      return settings
+    end
+
+    # Save settings
+    def self.save(hash = {})
+      puts "save #{hash}"
+      if File.exist?(SETTINGS)
+        file = File.open(SETTINGS)
+      else
+        file = File.new(SETTINGS, "w")
+      end
+
+      file.write(hash)
+      file.close
+
+      return true
+    end
   end
 
 end

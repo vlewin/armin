@@ -1,0 +1,7 @@
+%h2 Services
+- form_tag  url_for(:services, :save), :method => 'post' do
+  - @services.each do |s|
+    %p
+      = label_tag s.name
+      = check_box_tag s.name
+  = submit_tag "Save"
