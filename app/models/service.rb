@@ -22,8 +22,13 @@ class Service
     end
 
     JSON(Service::Settings.load).each do |s|
-      services << Service.new(s, processes[DAEMON[s]], processes[DAEMON[s]].nil? ? "-" : "running")
+      if DAEMON[s]
+        services << Service.new(s, processes[DAEMON[s]], processes[DAEMON[s]].nil? ? "-" : "running")
+      else
+        services << Service.new(s, processes[DAEMON[s]], processes[s].nil? ? "-" : "running")
+      end
     end
+
     services.sort_by{|s| s.name }
   end
 
