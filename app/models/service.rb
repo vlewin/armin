@@ -1,6 +1,6 @@
 DAEMON = {"ssh" => "sshd", "ntp" => "ntpd", "samba" => "smbd"}
 EXCLUDE = ["rsyslog", "portmap", "acpid"]
-SETTINGS = File.join(PADRINO_ROOT, "/app/conf/settings.json")
+SETTINGS = File.join(PADRINO_ROOT, "/settings/services-settings.json")
 
 class Service
   attr_accessor :pid, :name, :status
@@ -55,26 +55,33 @@ class Service
   class Settings
     # Load settings
     def self.load
+      settings = {}
       if File.exist?(SETTINGS)
-        file = File.open(SETTINGS)
-        settings = file.read
-        puts settings.inspect
-        file.close
+        begin
+          file = File.open(SETTINGS)
+          settings = file.read
+        rescue IOError => e
+          puts "The file cannot be read #{e.inspect}"
+          return false
+        ensure
+          file.close unless file.nil?
+        end
       end
+
       return settings
     end
 
     # Save settings
     def self.save(hash = {})
-      puts "save #{hash}"
-      if File.exist?(SETTINGS)
-        file = File.open(SETTINGS)
-      else
-        file = File.new(SETTINGS, "w")
+      begin
+        file = File.exist?(SETTINGS)? File.open(SETTINGS, "w") : File.new(SETTINGS, "w")
+        file.write(hash)
+      rescue IOError => e
+        puts "The file cannot be written #{e.inspect}"
+        return false
+      ensure
+        file.close unless file.nil?
       end
-
-      file.write(hash)
-      file.close
 
       return true
     end
