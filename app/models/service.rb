@@ -1,25 +1,39 @@
 DAEMON = {"ssh" => "sshd", "ntp" => "ntpd", "samba" => "smbd"}
-EXCLUDE = ["rsyslog", "portmap", "acpid", "README"]
+EXCLUDE = ["rc", "rc.local", "rcS", "console-setup", "bootlogd", "ifplugd", "ifupdown", "ifupdown-clean", "bootlogs", "rsyslog", "portmap", "acpid", "README"]
 SERVICES_SETTINGS = File.join(PADRINO_ROOT, "/settings/services-settings.json")
 
 class Service
   attr_accessor :pid, :name, :status
   INIT_DIR = "/etc/init.d"
 
-  def initialize(pid = nil, name = nil, status = nil)
+  def initialize(name = nil, pid = nil, status = nil)
     @pid = pid
     @name = name
     @status = status
   end
 
+  def self.saved
+    services = Array.new
+    processes = Hash.new
+
+    psaux = `ps aux` # get running processes from ps
+    psaux.split("\n").select do |line|
+      processes[line.split[10].split("/").last] = line.split[1] unless line.split[10].match(/\[/)
+    end
+
+    JSON(Service::Settings.load).each do |s|
+      services << Service.new(s, processes[DAEMON[s]], processes[DAEMON[s]].nil? ? "-" : "running")
+    end
+    services.sort_by{|s| s.name }
+  end
+
   def self.all
     files = Array.new
 
-    Dir.foreach(INIT_DIR) do |f| # list all services in /etc/init.d/, exlude directories and hidden files
+    Dir.foreach(INIT_DIR) do |f| # list all services in /etc/init.d/, exlude directories, hidden files, bash scripts
       unless File.directory?(f)
-        files << f if f[0].chr != '.'
+        files << f if f[0].chr != '.' && !File.fnmatch('**.sh', f)
       end
-
     end
 
     processes = Hash.new
@@ -35,9 +49,9 @@ class Service
       unless EXCLUDE.include?(f) # replace through user settings
         if DAEMON[f]
           puts "Process in white list #{f}"
-          services << Service.new(processes[DAEMON[f]], f, processes[DAEMON[f]].nil? ? "-" : "running")
+          services << Service.new(f, processes[DAEMON[f]], processes[DAEMON[f]].nil? ? "-" : "running")
         else
-          services << Service.new(processes[f], f, processes[f].nil? ? "-" : "running")
+          services << Service.new(f, processes[DAEMON[f]], processes[f].nil? ? "-" : "running")
         end
       end
     end
@@ -47,6 +61,7 @@ class Service
 
   # TODO: Forward output to UI
   def exec(action)
+    puts "***** #{action}ing service #{self.name}"
     out = system('#{INIT_DIR}/#{self.name} #{action}')
     back = `#{INIT_DIR}/#{self.name} #{action}`
     puts "#{INIT_DIR}/#{self.name} #{action}"
@@ -59,9 +74,9 @@ class Service
     # Load settings
     def self.load
       settings = {}
-      if File.exist?(SETTINGS)
+      if File.exist?(SERVICES_SETTINGS)
         begin
-          file = File.open(SETTINGS)
+          file = File.open(SERVICES_SETTINGS)
           settings = file.read
         rescue IOError => e
           puts "The file cannot be read #{e.inspect}"
@@ -77,7 +92,7 @@ class Service
     # Save settings
     def self.save(hash = {})
       begin
-        file = File.exist?(SETTINGS)? File.open(SETTINGS, "w") : File.new(SETTINGS, "w")
+        file = File.exist?(SERVICES_SETTINGS)? File.open(SERVICES_SETTINGS, "w") : File.new(SERVICES_SETTINGS, "w")
         file.write(hash)
       rescue IOError => e
         puts "The file cannot be written #{e.inspect}"
