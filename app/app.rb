@@ -1,7 +1,5 @@
 class Armin < Padrino::Application
   require 'sprockets'
-
-  register LessInitializer
   register Padrino::Rendering
   register Padrino::Helpers
   register Padrino::Sprockets # Sprockets support
