@@ -8,7 +8,8 @@ Armin.controllers :services do
   get :action, :map => '/services/action' do
     @service = Service.new(params[:pid], params[:name])
     @service.exec(params[:action])
-    render :status => 200
+    @services = Service.all
+    render 'services/settings'
   end
 
   get :settings, :map => '/services/settings' do
@@ -17,14 +18,12 @@ Armin.controllers :services do
   end
 
   post :save do
-    puts "save settings"
-    puts params.inspect
-
     if Service::Settings.save(params.to_json)
       flash[:notice] = 'Post was successfully created.'
       @services = Service.all
       redirect url(:services, :index)
     else
+      @services = Service.all
       flash[:notice] = 'ERROR'
     end
 #    if @post.save

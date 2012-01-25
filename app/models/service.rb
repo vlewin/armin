@@ -1,6 +1,6 @@
 DAEMON = {"ssh" => "sshd", "ntp" => "ntpd", "samba" => "smbd"}
-EXCLUDE = ["rsyslog", "portmap", "acpid"]
-SETTINGS = File.join(PADRINO_ROOT, "/settings/services-settings.json")
+EXCLUDE = ["rsyslog", "portmap", "acpid", "README"]
+SERVICES_SETTINGS = File.join(PADRINO_ROOT, "/settings/services-settings.json")
 
 class Service
   attr_accessor :pid, :name, :status
@@ -13,23 +13,26 @@ class Service
   end
 
   def self.all
-    services = Array.new
+    files = Array.new
+
+    Dir.foreach(INIT_DIR) do |f| # list all services in /etc/init.d/, exlude directories and hidden files
+      unless File.directory?(f)
+        files << f if f[0].chr != '.'
+      end
+
+    end
+
     processes = Hash.new
 
-    # list all services in /etc/init.d/
-    Dir.chdir(INIT_DIR)
-    files = Dir.entries(".").each{|f| f if File.file?(f) }
-
-    # get running processes from ps
-    psaux = `ps aux`
+    psaux = `ps aux` # get running processes from ps
     psaux.split("\n").select do |line|
       processes[line.split[10].split("/").last] = line.split[1] unless line.split[10].match(/\[/)
     end
 
-    files.each do |f|
-      if EXCLUDE.include?(f) # replace through user settings
-        puts "Process in black list #{f}"
-      else
+    services = Array.new
+
+    files.each do |f| # filter deamons and exlude system processes
+      unless EXCLUDE.include?(f) # replace through user settings
         if DAEMON[f]
           puts "Process in white list #{f}"
           services << Service.new(processes[DAEMON[f]], f, processes[DAEMON[f]].nil? ? "-" : "running")

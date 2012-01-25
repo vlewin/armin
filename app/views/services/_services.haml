@@ -1,11 +1,17 @@
-%div.size1of1
-  - @services.each do |s|
-    %div.size1of3= s.name
-    %div.size1of3
-      = s.pid
-      &nbsp;
-    %div.size1of3
-      %div.size1of2
-        = s.status
-      %div.size1of2
-        %a{:href=>"#", "data-pid" => s.pid, "data-name" => s.name, "data-action" => "stop" }= "stop" if s.status == "running"
+%table
+  %thead
+    %tr
+      %th Service
+      %th Service
+      %th Service
+  %tbody
+    - @services.each do |s|
+      %tr
+        %td= s.name
+        %td= s.status
+        %td
+          %div.size1of2
+            dsds
+            = link_to "start", " ", "data-pid" => s.pid, "data-name" => s.name, "data-action" => "start", :remote => true
+          %div.size1of2
+            %a{:href=>"#", "data-pid" => s.pid, "data-name" => s.name, "data-action" => "stop" }= "stop" if s.status == "running"

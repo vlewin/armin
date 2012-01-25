@@ -6,16 +6,11 @@
     = javascript_include_tag "/assets/application"
     = yield_content :include
   %body
-    %header
-      %h1.white ARM{in}
-      %h3 Adm{in} interface for ARM-based PCs
-      
-    %div.line
-      %section.size1of5.sidebar
+    %div.container-fluid
+      .sidebar
         %h2 Navigation
-        = link_to 'Index', url_for(:index)
-        = link_to "Running services", url_for(:services, :index), :class => "active"
-
-      %section.size4of5
+        %p= link_to 'Index', url_for(:index)
+        %p= link_to "Running services", url_for(:services, :index), :class => "active"
+        %p= link_to "Settings", url_for(:services, :settings)
+      .content
         = yield
-    
