@@ -1,0 +1,5 @@
+apt-get install git ruby rubygems
+apt-get install libsqlite3-dev
+gem install bundler
+export PATH=$PATH:/var/lib/gems/1.8/bin
+bundle install
