@@ -1,5 +1,5 @@
 ARM{in}
-Admin interface for ARM-based PCs
+Lightweight web adm{in} interface for ARM-based PCs
 
 Web Framework: Padrino
 :renderer: haml
@@ -10,4 +10,5 @@ Web Framework: Padrino
 :script: jquery
 
 Webserver: Thin
-CSS Grid System: Object Oriented Cascading Style Sheets (OOCSS)
+CSS Framework: Twitter Bootstrap
+CSS Grid: Object Oriented Cascading Style Sheets (OOCSS)

@@ -6,11 +6,17 @@
     = javascript_include_tag "/assets/application"
     = yield_content :include
   %body
-    %div.container-fluid
-      .sidebar
-        %h2 Navigation
-        %p= link_to 'Index', url_for(:index)
-        %p= link_to "Running services", url_for(:services, :index), :class => "active"
-        %p= link_to "Settings", url_for(:services, :settings)
-      .content
-        = yield
+    %div.topbar
+      %div.topbar-inner
+        %div.container
+          %h3
+            %a{:href=>"#"} ARM{in}
+          %ul.nav
+            %li= link_to 'Index', url_for(:index)
+            %li= link_to "Running services", url_for(:services, :index), :class => "active"
+            %li= link_to "Settings", url_for(:services, :settings)
+          %ul.nav.secondary-nav
+            %li
+              %a second
+
+      %div#yield.container= yield
