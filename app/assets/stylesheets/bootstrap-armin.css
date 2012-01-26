@@ -1,2 +1,4 @@
 .topbar{ position:relative; height:auto; margin-bottom: 10px;}
 #yield { padding-top:10px; }
+
+table#noresults { display: none; }

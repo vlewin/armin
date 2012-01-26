@@ -1,7 +1,21 @@
-%h2 Services
+.page-header
+  %h2 Services
+  %h4.helper-block Selected services will be shown on index page
+
 - form_tag  url_for(:services, :save), :method => 'post' do
-  - @services.each do |s|
-    %p
-      = label_tag s.name
-      = check_box_tag s.name
+  %table.services
+    %thead
+      %tr
+        %th
+          %h4 Service name
+        %th.right= input_tag :search, :class => "search"
+    %tbody
+      %tr#noresults
+        %td{:colspan => 2}
+          %h6 No results!
+      - @services.each do |s|
+        %tr
+          %td= s.name
+          %td= check_box_tag s.name, :checked => @checked.include?(s.name)
+
   = submit_tag "Save"

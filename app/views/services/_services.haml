@@ -1,17 +1,24 @@
-%table
+.flash
+  = @flash.inspect if @flash
+
+%table.services
   %thead
     %tr
+      %th {img}
       %th Service
-      %th Service
-      %th Service
+      %th Status
+      %th.right= input_tag :search, :class => "search", :value => " "
   %tbody
+    %tr#noresults
+      %td{:colspan => 3}
+        %h6 No results!
     - @services.each do |s|
       %tr
+        %td= image_tag 'warning-disabled.png'
         %td= s.name
         %td= s.status
-        %td
-          %div.size1of2
-            -if s.status == "running"
-              = link_to "stop", " ", "data-pid" => s.pid, "data-name" => s.name, "data-action" => "stop", :remote => true
-            - else
-              = link_to "start", " ", "data-pid" => s.pid, "data-name" => s.name, "data-action" => "start", :remote => true
+        %td.right
+          -if s.status == "running"
+            = link_to "stop", " ", "data-pid" => s.pid, "data-name" => s.name, "data-action" => "stop", :remote => true
+          - else
+            = link_to "start", " ", "data-pid" => s.pid, "data-name" => s.name, "data-action" => "start", :update => 'services', :remote => true
