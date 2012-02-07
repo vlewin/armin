@@ -1,5 +1,5 @@
-.flash
-  = @flash.inspect if @flash
+%div.flash{:class=>(@flash[:type] if @flash)}
+  = "#{@flash[:type].upcase}: #{@flash[:message].capitalize!} #{@flash[:error].capitalize!}" if @flash
 
 %table.services
   %thead
@@ -9,16 +9,18 @@
       %th Status
       %th.right= input_tag :search, :class => "search", :value => " "
   %tbody
-    %tr#noresults
-      %td{:colspan => 3}
-        %h6 No results!
     - @services.each do |s|
       %tr
-        %td= image_tag 'warning-disabled.png'
+        %td
+          = image_tag 'warning-disabled.png'
+          = image_tag 'wait.gif', :class=>"animation", :hidden=> true
         %td= s.name
-        %td= s.status
+        %td.status{:class=>("green" if s.status == "running")}= s.status
         %td.right
           -if s.status == "running"
-            = link_to "stop", " ", "data-pid" => s.pid, "data-name" => s.name, "data-action" => "stop", :remote => true
+            = link_to "stop", " ", "data-name" => s.name, "data-action" => "stop", :remote => true
           - else
-            = link_to "start", " ", "data-pid" => s.pid, "data-name" => s.name, "data-action" => "start", :update => 'services', :remote => true
+            = link_to "start", " ", "data-name" => s.name, "data-action" => "start", :update => 'services', :remote => true
+    %tr#noresults
+      %td{:colspan => 4}
+        %h6 No results!

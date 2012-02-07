@@ -5,6 +5,10 @@ $(document).ready(function(){
 
   $("#services a").live("click", function() {
     var service = { "pid": $(this).data("pid"), "name" : $(this).data("name"), "action" : $(this).data("action")}
+    var $parent = $(this).parents("tr")
+    $parent.find("img").toggle()
+
+    $parent.find("td.status").html("please wait ...")
     $.ajax({
       url: "/services/action",
       data: service,

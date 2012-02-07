@@ -2,3 +2,11 @@
 #yield { padding-top:10px; }
 
 table#noresults { display: none; }
+
+table img { width:24px; height:24px; }
+
+div.flash { padding:5px; }
+div.warning { border: 2px solid orange; }
+
+/*colors*/
+.green { color: green; }

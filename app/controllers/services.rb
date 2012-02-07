@@ -1,28 +1,19 @@
 Armin.controllers :services do
   get :index, :map => '/services' do
-    @services = Service.saved
+    @services = Service.selected
     render 'services/index'
   end
 
   get :action, :provides => [:html, :js] do
     @service = Service.new(params[:name])
-    response = @service.exec(params[:action])
-    @services = Service.saved
-
-    if response[:status] == "success"
-      @flash = "Success: #{response[:message]}"
-    elsif response[:status] == "warning"
-      @flash = "Warning: #{response[:error]}"
-    else
-      @flash = "Error: #{response[:error]}"
-    end
-
+    @flash = @service.exec(params[:action])
+    @services = Service.selected
     partial 'services/services', :object => @services, :locals => { :flash => @flash}
   end
 
   get :settings, :map => '/services/settings' do
     @services = Service.all
-    @checked = Service.saved.map(&:name)
+    @selected = Service.selected.map(&:name)
     render 'services/settings'
   end
 
@@ -34,7 +25,7 @@ Armin.controllers :services do
       flash[:notice] = 'ERROR: Can not save selected services!'
     end
 
-    @services = Service.saved
+    @services = Service.selected
     redirect url(:services, :index)
 
   end

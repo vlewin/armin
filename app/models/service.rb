@@ -1,32 +1,50 @@
-DAEMON = {"ssh" => "sshd", "ntp" => "ntpd", "samba" => "smbd", "dbus" => "dbus-daemon"}
-EXCLUDE = ["rc", "rc.local", "rcS", "console-setup", "bootlogd", "ifplugd", "ifupdown", "ifupdown-clean", "bootlogs", "rsyslog", "portmap", "acpid", "README"]
-#SERVICES_SETTINGS = File.join(PADRINO_ROOT, "/settings/services-settings.json")
+EXCEPTIONS = {"apache2" => "httpd2-prefork", "postgresql" => "postmaster", "mysqld_safe" => "mysql"}
 
+# HELPERS
+def list_processes
+  array = Array.new
+  status, stdout, stderr = systemu "ps -e"
+
+  stdout.split("\n").select do |line|
+    p = line.split[3]
+    next if EXCEPTIONS.include?(p)
+    array << p unless p.match(/\[/) #exclude
+  end
+
+  array
+end
+
+def running?(ps, service)
+  service = EXCEPTIONS.has_key?(service)? EXCEPTIONS[service] : service
+
+  ps.each do |k|
+    puts "running #{k}" if k.match(service)
+    return true if k.match(service)
+  end
+
+  return false
+end
 
 class Service
-  attr_accessor :pid, :name, :status
-  INIT_DIR = "/etc/init.d"
+  attr_accessor :name, :status
+  @@init_dir = "/etc/init.d"
 
-  def initialize(name = nil, pid = nil, status = nil)
-    @pid = pid
+  def initialize(name = nil, status = nil)
     @name = name
     @status = status
   end
 
-  def self.saved
+  def self.selected
     services = Array.new
-    processes = Hash.new
+    ps = list_processes
 
-    psaux = `ps aux` # get running processes from ps
-    psaux.split("\n").select do |line|
-      processes[line.split[10].split("/").last] = line.split[1] unless line.split[10].match(/\[/)
-    end
-
-    JSON(Service::Settings.load).each do |s|
-      if DAEMON[s]
-        services << Service.new(s, processes[DAEMON[s]], processes[DAEMON[s]].nil? ? "-" : "running")
+    JSON(Service::Settings.load).each do |entry|
+      service = running?(ps, entry)
+      puts "Service #{entry} and #{service}"
+      if service
+        services << Service.new(entry, 'running')
       else
-        services << Service.new(s, processes[DAEMON[s]], processes[s].nil? ? "-" : "running")
+        services << Service.new(entry, 'not running')
       end
     end
 
@@ -36,59 +54,34 @@ class Service
   def self.all
     files = Array.new
 
-    Dir.foreach(INIT_DIR) do |f| # list all services in /etc/init.d/, exlude directories, hidden files, bash scripts
+    Dir.foreach(@@init_dir) do |f| # list all services in /etc/init.d/, exclude directories, hidden files, bash scripts, ...
       unless File.directory?(f)
-        files << f if f[0].chr != '.' && !File.fnmatch('**.sh', f)
+        files << f if f[0].chr != '.' && !File.fnmatch('**.sh', f) && !f.match('boot') && !f.match('rc')
       end
-    end
-
-    processes = Hash.new
-
-    psaux = `ps aux` # get running processes from ps
-    psaux.split("\n").select do |line|
-      processes[line.split[10].split("/").last] = line.split[1] unless line.split[10].match(/\[/)
     end
 
     services = Array.new
-
-    files.each do |f| # filter deamons and exlude system processes
-      unless EXCLUDE.include?(f) # replace through user settings
-        if DAEMON[f]
-          services << Service.new(f, processes[DAEMON[f]], processes[DAEMON[f]].nil? ? "-" : "running")
-        else
-          services << Service.new(f, processes[DAEMON[f]], processes[f].nil? ? "-" : "running")
-        end
-      end
-    end
-
+    files.each{|f| services << Service.new(f) }
     services.sort_by{|s| s.name }
   end
 
-  # TODO:Better error handling !!!
   def exec(action)
-    # status
-    # 0 = success
-    # 1 = warning
-    # 2 = error
 
-    command = "#{INIT_DIR}/#{self.name} #{action}"
+    command = "#{@@init_dir}/#{self.name} #{action}"
     status, stdout, stderr = systemu command
 
+    puts command
+    puts status
+    puts stdout.inspect
+    puts stderr.inspect
+    puts "\n"
+
     if status == 0 && stderr.blank?
-      p "clear exit"
-      p "Stdout: #{stdout}"
-      return {:message => "#{stdout}", :status => "success" }
+      return {:message => "#{stdout}", :type => "success" }
     elsif status == 0 && !stderr.blank?
-      p "check if process is running"
-      p "Stdout: #{stdout}"
-      p "Stderr: #{stderr}"
-      return {:message => "#{stdout}", :error => "#{stderr}", :status => "warning" }
+      return {:message => "#{stdout}", :error => "#{stderr}", :type => "warning" }
     else
-      p "Bad exist status #{status}"
-      p "Status: #{status}"
-      p "Stdout: #{stdout}"
-      p "Stderr: #{stderr}"
-      return {:message => "#{stdout}", :error => "#{stderr}", :status => "error" }
+      return {:message => "#{stdout}", :error => "#{stderr}", :type => "error" }
     end
   end
 
@@ -113,10 +106,10 @@ class Service
     end
 
     # Save settings
-    def self.save(hash = {})
+    def self.save(array = [])
       begin
         file = File.open(@settings, "w")
-        file.write(hash)
+        file.write(array)
       rescue Errno::ENOENT => e
         puts "*** Exception: #{e.inspect}"
         return false

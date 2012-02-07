@@ -16,6 +16,6 @@
       - @services.each do |s|
         %tr
           %td= s.name
-          %td= check_box_tag s.name, :checked => @checked.include?(s.name)
+          %td= check_box_tag s.name, :checked => @selected.include?(s.name)
 
   = submit_tag "Save"
