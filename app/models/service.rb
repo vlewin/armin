@@ -18,7 +18,6 @@ def running?(ps, service)
   service = EXCEPTIONS.has_key?(service)? EXCEPTIONS[service] : service
 
   ps.each do |k|
-    puts "running #{k}" if k.match(service)
     return true if k.match(service)
   end
 
@@ -39,12 +38,13 @@ class Service
     ps = list_processes
 
     JSON(Service::Settings.load).each do |entry|
-      service = running?(ps, entry)
-      puts "Service #{entry} and #{service}"
-      if service
-        services << Service.new(entry, 'running')
-      else
-        services << Service.new(entry, 'not running')
+      if entry.empty?
+        service = running?(ps, entry)
+        if service
+          services << Service.new(entry, 'running')
+        else
+          services << Service.new(entry, 'not running')
+        end
       end
     end
 
@@ -54,7 +54,8 @@ class Service
   def self.all
     files = Array.new
 
-    Dir.foreach(@@init_dir) do |f| # list all services in /etc/init.d/, exclude directories, hidden files, bash scripts, ...
+	# list all services in /etc/init.d/, exclude directories, hidden files, bash scripts, ...
+    Dir.foreach(@@init_dir) do |f| 
       unless File.directory?(f)
         files << f if f[0].chr != '.' && !File.fnmatch('**.sh', f) && !f.match('boot') && !f.match('rc')
       end
@@ -95,9 +96,9 @@ class Service
       begin
         file = File.open(@settings)
         settings = file.read
-      rescue IOError => e
+      rescue Errno::ENOENT => e
         puts "*** Exception: #{e.inspect}"
-        return false
+        return {}
       ensure
         file.close unless file.nil?
       end
