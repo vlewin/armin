@@ -1,3 +1,12 @@
+%a.action link
+
+#page
+  #slider
+    .slide
+      %h2 Slide 1
+    .slide
+      %h2 Slide 2
+
 .page-header
   %h2 Services
   %h4.helper-block Selected services will be shown on index page
@@ -10,12 +19,14 @@
           %h4 Service name
         %th.right= input_tag :search, :class => "search"
     %tbody
+      %tr
+        %td= @services.count
       %tr#noresults
         %td{:colspan => 2}
           %h6 No results!
-      - @services.each do |s|
-        %tr
+      - @services.each_with_index do |s, i|
+        %tr{:class=> ("page" if i%20 == 0) }
           %td= s.name
-          %td= check_box_tag s.name, :checked => @selected.include?(s.name)
+          %td.right= check_box_tag s.name, :checked => @selected.include?(s.name)
 
   = submit_tag "Save"

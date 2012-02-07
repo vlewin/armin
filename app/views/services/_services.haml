@@ -1,10 +1,10 @@
-%div.flash{:class=>(@flash[:type] if @flash)}
-  = "#{@flash[:type].upcase}: #{@flash[:message].capitalize!} #{@flash[:error].capitalize!}" if @flash
+%div.flash{:class => (@cflash[:type] if @cflash)}= @cflash[:message].capitalize! if @cflash
+
+%h2 Services
 
 %table.services
   %thead
     %tr
-      %th {img}
       %th Service
       %th Status
       %th.right= input_tag :search, :class => "search", :value => " "
@@ -14,7 +14,9 @@
         %td
           = image_tag 'warning-disabled.png'
           = image_tag 'wait.gif', :class=>"animation", :hidden=> true
-        %td= s.name
+          = s.name
+
+
         %td.status{:class=>("green" if s.status == "running")}= s.status
         %td.right
           -if s.status == "running"

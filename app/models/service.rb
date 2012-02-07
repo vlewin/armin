@@ -79,9 +79,9 @@ class Service
     if status == 0 && stderr.blank?
       return {:message => "#{stdout}", :type => "success" }
     elsif status == 0 && !stderr.blank?
-      return {:message => "#{stdout}", :error => "#{stderr}", :type => "warning" }
+      return {:message => "#{stderr}", :type => "warning" }
     else
-      return {:message => "#{stdout}", :error => "#{stderr}", :type => "error" }
+      return {:message => "#{stderr}", :type => "error" }
     end
   end
 

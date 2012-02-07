@@ -13,7 +13,6 @@ $(document).ready(function(){
       url: "/services/action",
       data: service,
       success: function(data){
-        console.log(data)
         $("#services").html(data);
 
         $('input.search').quicksearch('table.services tbody tr', {
@@ -22,4 +21,9 @@ $(document).ready(function(){
       }
     });
   });
+
+  $("a.action").live("click", function() {
+    console.log("sss")
+    $("#slider").stop().animate({"margin-left":-940},200)
+  })
 });

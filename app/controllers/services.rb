@@ -6,9 +6,9 @@ Armin.controllers :services do
 
   get :action, :provides => [:html, :js] do
     @service = Service.new(params[:name])
-    @flash = @service.exec(params[:action])
+    @cflash = @service.exec(params[:action])
     @services = Service.selected
-    partial 'services/services', :object => @services, :locals => { :flash => @flash}
+    partial 'services/services', :object => @services, :locals => { :cflash => @cflash}
   end
 
   get :settings, :map => '/services/settings' do
@@ -18,15 +18,13 @@ Armin.controllers :services do
   end
 
   post :save do
-    puts params.inspect
     if Service::Settings.save(params.map{|k,v| k}.to_json)
-      flash[:notice] = 'Post was successfully created.'
+      flash[:success] = 'Service was successfully added'
     else
-      flash[:notice] = 'ERROR: Can not save selected services!'
+      flash[:error] = 'Can not save selected services'
     end
 
-    @services = Service.selected
-    redirect url(:services, :index)
-
+    #@services = Service.selected
+    redirect url(:services, :index )
   end
 end

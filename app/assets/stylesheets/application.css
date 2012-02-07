@@ -8,6 +8,9 @@
 *= require_tree .
 */
 
+/* Colors */
+.green { color: green; }
+
 /* Helpers */
 .left { text-align:left; }
 .middle { text-align:middle; }
