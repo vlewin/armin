@@ -1,4 +1,4 @@
-EXCEPTIONS = {"apache2" => "httpd2-prefork", "postgresql" => "postmaster", "mysqld_safe" => "mysql"}
+EXCEPTIONS = {"apache2" => "httpd2-prefork", "postgresql" => "postmaster", "mysqld_safe" => "mysql", "samba" => "smbd"}
 
 # HELPERS
 def list_processes
@@ -16,11 +16,7 @@ end
 
 def running?(ps, service)
   service = EXCEPTIONS.has_key?(service)? EXCEPTIONS[service] : service
-
-  ps.each do |k|
-    return true if k.match(service)
-  end
-
+  ps.each{|k| return true if k.match(service)}
   return false
 end
 
@@ -38,13 +34,11 @@ class Service
     ps = list_processes
 
     JSON(Service::Settings.load).each do |entry|
-      if entry.empty?
-        service = running?(ps, entry)
-        if service
-          services << Service.new(entry, 'running')
-        else
-          services << Service.new(entry, 'not running')
-        end
+      service = running?(ps, entry)
+      if service
+        services << Service.new(entry, 'running')
+      else
+        services << Service.new(entry, 'not running')
       end
     end
 
@@ -88,28 +82,28 @@ class Service
 
   # store settings in JSON format
   class Settings
-    @settings = File.join(PADRINO_ROOT, "/settings/services-settings.json")
+    @@file = File.join(PADRINO_ROOT, "/settings/services-settings.json")
 
     # Load settings
     def self.load
-      settings = {}
+      settings = []
       begin
-        file = File.open(@settings)
+        file = File.open(@@file)
         settings = file.read
       rescue Errno::ENOENT => e
         puts "*** Exception: #{e.inspect}"
-        return {}
+        return false
       ensure
         file.close unless file.nil?
       end
-
       settings
     end
 
     # Save settings
     def self.save(array = [])
       begin
-        file = File.open(@settings, "w")
+      	Dir.mkdir("settings") unless File.exist?("settings")
+        file = File.open(@@file, "w")
         file.write(array)
       rescue Errno::ENOENT => e
         puts "*** Exception: #{e.inspect}"

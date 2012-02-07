@@ -26,5 +26,7 @@ $(document).ready(function(){
   $("a.action").live("click", function() {
     console.log("sss")
     $("#slider").stop().animate({"margin-left":-940},200)
-  })
+  }) 
+  
+  $('table').paginate({});
 });
