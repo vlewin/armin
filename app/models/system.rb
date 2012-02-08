@@ -1,4 +1,4 @@
-class System
+class SystemInfo
   class FileSystem
     @@variables = [:partition, :size, :used, :free, :usage, :mount]
     attr_reader *@@variables
@@ -10,27 +10,24 @@ class System
       end
     end
 
-    def self.usage
+    def self.all
       partitions = []
-
       status, stdout, stderr = systemu "df -h"
-      stdout.split("\n").select do |line|
-        partitions << Partition.new(line) if line.split[0].match("/dev/")
+      stdout.split("\n").each_with_index do |line, index|
+        partitions << FileSystem.new(line) if line.split[0] && index != 0
       end
 
       partitions
     end
 
-    def self.find(name)
+    def self.find(partition)
       status, stdout, stderr = systemu "df -h"
       stdout.split("\n").select do |line|
-        puts Partition.new(line).usage.to_i if line.split[0].match(name)
-        return Partition.new(line).usage.to_i if line.split[0].match(name)
+        puts line
+        return FileSystem.new(line).usage.to_i if line.split[0].match(partition)
       end
-
       return false
     end
-
   end
 
   class CPU

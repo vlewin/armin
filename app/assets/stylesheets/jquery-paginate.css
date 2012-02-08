@@ -1,0 +1,27 @@
+#navigationToolbar { text-align:right; margin:0px 0px 10px 0px; clear:both; overflow:hidden;}
+#navigationToolbar a.navigationLink {
+  padding:2px;
+  margin:0px 2px;
+  height:16px;
+  width:16px;
+  line-height:17px;
+
+  text-align:center;
+  outline: 0;
+  border-radius:2px;
+
+  color:#666;
+  text-shadow: 0px 1px #fff;
+  border: 1px solid #CCC;
+
+  display:inline-block;
+
+  background-color: #E6E6E6;
+  background-image: -moz-linear-gradient(center top , #FFFFFF, #FFFFFF 25%, #E6E6E6);
+}
+
+#navigationToolbar a.navigationLink.selected {
+  color: #444;
+  border: 1px solid #999;
+  box-shadow: 0px 0px 3px #bbb inset;
+}

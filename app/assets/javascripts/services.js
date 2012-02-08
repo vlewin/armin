@@ -1,4 +1,5 @@
 $(document).ready(function(){
+  var list = 0;
   $('input.search').quicksearch('table.services tbody tr', {
     'noResults': 'tr#noresults'
   });
@@ -36,65 +37,34 @@ $(document).ready(function(){
     startRow: 1
   });
 
-
-//  var data = [];
-//var series = Math.floor(Math.random()*10)+1;
-//for( var i = 0; i<series; i++)
-//{
-//data[i] = { label: "Series"+(i+1), data: Math.floor(Math.random()*100)+1 }
-//}
-
-//console.log(data)
-//data = [{"data":95, "label":"Serie"}, {"data":95, "label":"Serie"}]
-
-//  $.plot($("#graph1"), data, {
-//    series: {
-//      pie: {
-//        show: true
-//      }
-//    },
-//    legend: {
-//      show: false
-//    }
-//  });
-
-
-var data = [{"data":10, "label":"used"}, {"data":10, "label":"free"}];
 var options = {
   series: {
     pie:{
       show: true,
       radius:1,
       label: {
-         show: true,
-         color: '#222',
-         radius: 80,
-         formatter: function(label, series){
-            return '<div class="chart-label"> ' + Math.round(series.percent)+'%<br/>' + label + '</div>';
-         }
-
-      },
-      background: { opacity: 0.8 }
+        show: true,
+        color: '#222',
+        radius: 50,
+        formatter: function(label, series){
+          return '<div class="chart-label"> ' + Math.round(series.percent)+'%<br/>' + label + '</div>';
+        }
+      }    
     }
+  }, legend:{show: false}
+}
 
-  },
 
-  legend:{show: false}
+	getFileSystemUsage();
+	
+	
+	function getFileSystemUsage() {
+	  console.log(list)
+	  $.getJSON('filesystem', "partition=rootfs", function(json) {
+        $.plot($("#graph3"), json, options);
+	  })
+	}
 
-  }
-
-	$.getJSON('filesystem', "name=sda1", function(json) {
-      $.plot($("#graph1"), json, options);
-
-	})
-
-	$.getJSON('filesystem', "name=sda3", function(json) {
-      $.plot($("#graph2"), json, options);
-	})
-
-	$.getJSON('filesystem', "name=sda5", function(json) {
-      $.plot($("#graph3"), json, options);
-	})
 //	setInterval(getData, 1000);
 
 

@@ -1,15 +1,19 @@
+:javascript
+  $(document).ready(function(){
+    list = "#{@list}"
+  });
+
 %h3 ARM{in} is a lightweight web adm{in} interface for ARM-based PCs
 
+= @partitions.count
+  
 .row
   .span16
     .page-header
       %h4 File system
-  .span4
-    #graph1{:style=>"width:100%;height:200px"}
-  .span4
-    #graph2{:style=>"width:100%;height:200px"}
-  .span4
-    #graph3{:style=>"width:100%;height:200px"}
+  - @partitions.each_with_index do |p, i|
+    .span4
+      .chart{:id => "graph#{i}"}
 
 %br
 
@@ -21,12 +25,12 @@
     %h5 File System
     %table
       %tr
-        %td Part
+        %td Partition
         %td Size
         %td Used
-        %td Free
+        %td Avail
         %td Usage
-        %td Mount
+        %td Mount point
       - @partitions.each do |p|
         %tr
           %td= p.partition
@@ -41,3 +45,5 @@
 
   .span16
     %h5 RAM Usage
+
+

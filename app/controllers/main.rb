@@ -2,15 +2,20 @@ require "system"
 
 Armin.controllers :main do
   get :index, :map => "/" do
-    @partitions = System::FileSystem.usage
-    @cpu = System::CPU.usage
+    @partitions = SystemInfo::FileSystem.all
+    @list = @partitions.map(&:partition)
+    @cpu = SystemInfo::CPU.usage
     render 'main/index'
   end
 
   get :index, :map => "/filesystem" do
-    puts params.inspect
-    used = System::FileSystem.find(params[:name])
-    free = (100-used)
-    return [{:data=> used, :label => "free"}, {:data=>free, :label => "used"}].to_json
+    data = SystemInfo::FileSystem.find(params[:partition])
+    if data
+      free = (100-data)
+      return [{:data=> data, :label => "free"}, {:data=>free, :label => "used"}].to_json
+    else
+      return data.to_json
+    end
   end
+
 end
