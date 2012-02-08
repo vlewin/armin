@@ -37,33 +37,20 @@ $(document).ready(function(){
     startRow: 1
   });
 
-var options = {
-  series: {
-    pie:{
-      show: true,
-      radius:1,
-      label: {
-        show: true,
-        color: '#222',
-        radius: 50,
-        formatter: function(label, series){
-          return '<div class="chart-label"> ' + Math.round(series.percent)+'%<br/>' + label + '</div>';
-        }
-      }    
-    }
-  }, legend:{show: false}
+
+
+/*
+
+getFileSystemUsage();
+
+
+function getFileSystemUsage() {
+  console.log(list)
+  $.getJSON('filesystem', "partition=rootfs", function(json) {
+    $.plot($("#graph3"), json, options);
+  })
 }
-
-
-	getFileSystemUsage();
-	
-	
-	function getFileSystemUsage() {
-	  console.log(list)
-	  $.getJSON('filesystem', "partition=rootfs", function(json) {
-        $.plot($("#graph3"), json, options);
-	  })
-	}
+*/
 
 //	setInterval(getData, 1000);
 

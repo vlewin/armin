@@ -1,11 +1,43 @@
 :javascript
   $(document).ready(function(){
-    list = "#{@list}"
+    list = #{@list.inspect}
+    var options = {
+    series: {
+     pie:{
+       show: true,
+       radius:1,
+       label: {
+    	 show: true,
+    	 color: '#222',
+    	 radius: 50,
+    	 formatter: function(label, series){
+    	   return '<div class="chart-label"> ' + Math.round(series.percent)+'%<br/>' + label + '</div>';
+    	 }
+       }	
+     }
+    }, legend:{show: false}
+    }
+    
+    
+    for(var i=0; i<list.length; i++) {
+      console.log(list[i])
+      getFileSystemUsage(list[i], i);
+    }
+    
+    
+    function getFileSystemUsage(partition, position) {
+      console.log(partition)
+      
+      $.getJSON('filesystem', "partition="+partition, function(json) {
+        var $container = $("#graph"+position);
+        $container.before("<h5 class='center'>" + partition +"</h5>")
+        $.plot($container, json, options);
+      })
+    }
+
   });
 
 %h3 ARM{in} is a lightweight web adm{in} interface for ARM-based PCs
-
-= @partitions.count
   
 .row
   .span16

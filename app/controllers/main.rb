@@ -9,12 +9,12 @@ Armin.controllers :main do
   end
 
   get :index, :map => "/filesystem" do
-    data = SystemInfo::FileSystem.find(params[:partition])
-    if data
-      free = (100-data)
-      return [{:data=> data, :label => "free"}, {:data=>free, :label => "used"}].to_json
+    used = SystemInfo::FileSystem.find(params[:partition])
+    if used
+      free = (100-used)
+      return [{:data=> free, :label => "free"}, {:data=>used, :label => "used"}].to_json
     else
-      return data.to_json
+      return used.to_json
     end
   end
 
