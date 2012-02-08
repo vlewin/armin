@@ -9,8 +9,8 @@ class Armin < Padrino::Application
   enable :sessions
   layout :application
 
-  get :index, :map => "/" do
-    render 'main/index'
+  get :index, :map => "/main/index" do
+    # Root URL
   end
 
   # Application configuration options

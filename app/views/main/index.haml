@@ -1,5 +1,43 @@
-%header#overview.jumbotron.masthead
-  %div.inner
-    %div.container
-    %h1 Welcome admin
-    %h3 ARM{in} is a lightweight web adm{in} interface for ARM-based PCs
+%h3 ARM{in} is a lightweight web adm{in} interface for ARM-based PCs
+
+.row
+  .span16
+    .page-header
+      %h4 File system
+  .span4
+    #graph1{:style=>"width:100%;height:200px"}
+  .span4
+    #graph2{:style=>"width:100%;height:200px"}
+  .span4
+    #graph3{:style=>"width:100%;height:200px"}
+
+%br
+
+.row
+  .span16
+    .page-header
+      %h4 System informations
+  .span16
+    %h5 File System
+    %table
+      %tr
+        %td Part
+        %td Size
+        %td Used
+        %td Free
+        %td Usage
+        %td Mount
+      - @partitions.each do |p|
+        %tr
+          %td= p.partition
+          %td= p.size
+          %td= p.used
+          %td= p.free
+          %td= p.usage
+          %td= p.mount
+  .span16
+    %h5 CPU usage in %
+    = @cpu
+
+  .span16
+    %h5 RAM Usage
